@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Tutorials Code Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
+<style>
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #48e5c2;
+  --dark-bg: #1e1e2d;
+  --card-bg: #2a2a3e;
+  --text-color: #e0e0e0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, var(--dark-bg) 0%, #000000 100%);
+  color: var(--text-color);
+  min-height: 100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius:20px;
+  padding:20px;
+  margin:15px 0;
+  box-shadow:0 10px 25px rgba(0,0,0,0.4);
+  border:2px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(5px);
+  width:100%;
+  max-width:500px;
+  text-align:center;
+}
+
+input, button {
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border:none;
+  width:100%;
+  font-size:1em;
+}
+
+button {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  color:#fff;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
+}
+
+button:hover { transform:scale(1.05); box-shadow:0 0 20px var(--primary-color),0 0 25px var(--secondary-color); }
+
+#message {
+  margin-top:15px;
+  font-weight:600;
+}
+</style>
+</head>
+<body>
+
+<h1>AI cg</h1>
+
+<div id="loginCard" class="card">
+  <h3>Admin Login</h3>
+  <input type="email" id="adminEmail" placeholder="Enter admin email">
+  <input type="password" id="adminPass" placeholder="Enter admin password">
+  <button onclick="adminLogin()">Login</button>
+  <div id="loginMsg"></div>
+</div>
+
+<div id="genCard" class="card" style="display:none;">
+  <h3>Generate Access Code</h3>
+  <input type="email" id="userEmail" placeholder="Enter user email">
+  <button onclick="generateCode()">Generate Code</button>
+  <div id="message"></div>
+</div>
+
+<script>
+// ✅ Backendless setup
+Backendless.serverURL = "https://api.backendless.com";
+Backendless.initApp(
+    "EC3F680C-888B-4849-A309-C6BBA192EF6E",  // App ID
+    "F2685256-D127-4363-B348-94D386889B02"   // API Key
+);
+
+let currentAdmin = null;
+
+// ✅ Admin login
+async function adminLogin() {
+  const email = document.getElementById("adminEmail").value.trim();
+  const pass = document.getElementById("adminPass").value.trim();
+  const msg = document.getElementById("loginMsg");
+
+  msg.innerHTML = "";
+
+  if (!email || !pass) {
+    msg.innerHTML = `<p style="color:#ff6b6b;">❌ Enter both email & password.</p>`;
+    return;
+  }
+
+  try {
+    const admin = await Backendless.UserService.login(email, pass, true);
+
+    if (admin.email !== "nmbashau@gmail.com") {
+      msg.innerHTML = `<p style="color:#ff6b6b;">❌ Unauthorized. Only super admin can login.</p>`;
+      return;
+    }
+
+    currentAdmin = admin;
+    document.getElementById("loginCard").style.display = "none";
+    document.getElementById("genCard").style.display = "block";
+  } catch(err) {
+    console.error(err);
+    msg.innerHTML = `<p style="color:#ff6b6b;">❌ Login failed.</p>`;
+  }
+}
+
+// ✅ Generate a random code
+function makeCode(length=8) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+// ✅ Save code for specific user
+async function generateCode() {
+  const email = document.getElementById("userEmail").value.trim().toLowerCase();
+  const msg = document.getElementById("message");
+
+  msg.innerHTML = "";
+
+  if (!email) {
+    msg.innerHTML = `<p style="color:#ff6b6b;">❌ Enter user email.</p>`;
+    return;
+  }
+
+  const code = makeCode();
+
+  try {
+    await Backendless.Data.of("PremiumAI_Codes").save({ email, code });
+    msg.innerHTML = `<p style="color:var(--secondary-color);">✅ Code generated for <strong>${email}</strong>: <strong>${code}</strong></p>`;
+  } catch(err) {
+    console.error(err);
+    msg.innerHTML = `<p style="color:#ff6b6b;">❌ Error saving code.</p>`;
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Video Uploader</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
+<style>
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #48e5c2;
+  --card-bg: #2a2a3e;
+  --text-color: #e0e0e0;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg,#1e1e2d 0%,#000 100%);
+  color: var(--text-color);
+  min-height: 100vh;
+  display:flex; justify-content:center; align-items:center;
+  flex-direction: column;
+}
+.card {
+  background: var(--card-bg);
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.4);
+  text-align:center;
+  width:90%; max-width:500px;
+  margin-bottom:20px;
+}
+input[type="file"], button, input[type="text"], input[type="password"] {
+  margin:10px 0; padding:10px; width:100%; border-radius:10px; border:none; outline:none;
+}
+button {
+  background: linear-gradient(90deg,var(--primary-color),var(--secondary-color));
+  color:#fff; cursor:pointer; font-weight:600;
+}
+button:hover { transform: scale(1.05); }
+h1 { color: var(--primary-color); margin-bottom:20px; }
+#status, #loginStatus { margin-top:10px; color:#fff; font-weight:600; }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<div class="card" id="loginCard">
+  <h1>Admin Login freeweb</h1>
+  <input type="text" id="adminEmail" placeholder="Admin Email">
+  <input type="password" id="adminPassword" placeholder="Password">
+  <button id="loginBtn">Login</button>
+  <p id="loginStatus"></p>
+</div>
+
+<div class="card" id="uploaderCard" style="display:none;">
+  <h1>Upload Video</h1>
+  <input type="text" id="videoTitle" placeholder="Video Title">
+  <input type="file" id="videoFile" accept="video/*">
+  <button id="uploadBtn" disabled>Upload Video</button>
+  <p id="status"></p>
+</div>
+
+<script>
+const APP_ID = "EC3F680C-888B-4849-A309-C6BBA192EF6E";
+const API_KEY = "F2685256-D127-4363-B348-94D386889B02";
+Backendless.serverURL = "https://api.backendless.com";
+Backendless.initApp(APP_ID, API_KEY);
+
+const loginBtn = document.getElementById("loginBtn");
+const uploadBtn = document.getElementById("uploadBtn");
+const videoFileInput = document.getElementById("videoFile");
+
+// Enable upload button when file selected
+videoFileInput.addEventListener("change", () => {
+  uploadBtn.disabled = !videoFileInput.files.length;
+});
+
+// Admin Login
+loginBtn.addEventListener("click", async () => {
+  const email = document.getElementById("adminEmail").value;
+  const password = document.getElementById("adminPassword").value;
+
+  if(!email || !password){
+    document.getElementById("loginStatus").innerText = "Please enter email & password";
+    return;
+  }
+
+  try {
+    const user = await Backendless.UserService.login(email, password, true);
+    if(user.email === "nmbashau@gmail.com"){  // Replace with your admin email
+      document.getElementById("loginCard").style.display = "none";
+      document.getElementById("uploaderCard").style.display = "block";
+    } else {
+      document.getElementById("loginStatus").innerText = "Access Denied: Not Admin";
+      await Backendless.UserService.logout();
+    }
+  } catch(err){
+    document.getElementById("loginStatus").innerText = "Login Failed: " + err.message;
+  }
+});
+
+// Upload Video
+uploadBtn.addEventListener("click", async () => {
+  const file = videoFileInput.files[0];
+  const title = document.getElementById("videoTitle").value;
+
+  if(!file) return alert("Please select a video.");
+  if(!title) return alert("Please enter a title.");
+
+  document.getElementById("status").innerText = "Uploading...";
+
+  try {
+    const uploadedFile = await Backendless.Files.upload(file, "FreeWebDevVideos");
+    const videoObj = { title, fileUrl: uploadedFile.fileURL };
+    await Backendless.Data.of("PremiumVideos").save(videoObj);
+    document.getElementById("status").innerText = "✅ Video uploaded successfully!";
+    document.getElementById("videoTitle").value = "";
+    videoFileInput.value = "";
+    uploadBtn.disabled = true;
+  } catch(err){
+    document.getElementById("status").innerText = "❌ Upload failed: " + err.message;
+  }
+});
+</script>
+
+</body>
+</html>

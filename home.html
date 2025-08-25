@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nater's Learning Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
+<style>
+:root{
+  --primary-color:#ff6b6b;
+  --secondary-color:#48e5c2;
+  --dark-bg:#1e1e2d;
+  --card-bg:#2a2a3e;
+  --text-color:#e0e0e0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#1e1e2d 0%,#000 100%);
+  color:var(--text-color);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+header.navbar{
+  display:flex;justify-content:space-between;align-items:center;padding:15px 30px;
+  background:var(--card-bg);box-shadow:0 5px 15px rgba(0,0,0,0.3);position:relative;z-index:1000;
+}
+header.navbar .profile-pic{
+  width:80px;height:80px;border-radius:50%;border:3px solid var(--primary-color);
+  cursor:pointer;object-fit:cover;box-shadow:0 0 15px var(--primary-color);
+}
+#sidebarToggle{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:var(--secondary-color);}
+#sidebarToggle i{font-size:1.5em;color:var(--secondary-color);}
+.sidebar{
+  position:fixed;top:0;left:0;transform:translateX(-100%);
+  width:50%;height:100vh;background:rgba(42,42,62,0.95);
+  backdrop-filter:blur(8px);padding:20px;display:flex;flex-direction:column;
+  overflow-y:auto;transition:transform 0.4s ease;z-index:2000;
+}
+.sidebar.open{transform:translateX(0);}
+.sidebar .close-btn{align-self:flex-end;font-size:1.5em;cursor:pointer;margin-bottom:20px;color:var(--secondary-color);}
+.sidebar a{color:var(--text-color);text-decoration:none;margin:5px 0;padding:10px;border-radius:10px;display:flex;align-items:center;transition:0.3s;}
+.sidebar a i{margin-right:10px;color:var(--secondary-color);}
+.sidebar a:hover{background:linear-gradient(90deg,var(--primary-color),var(--secondary-color));color:#fff;box-shadow:0 0 15px var(--primary-color),0 0 20px var(--secondary-color);}
+#sidebarOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1999;display:none;}
+.main-container{max-width:1000px;margin:80px auto 40px;padding:30px 20px;display:flex;flex-direction:column;gap:30px;}
+.card{background:var(--card-bg);border-radius:20px;padding:30px;box-shadow:0 10px 25px rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.1);backdrop-filter:blur(5px);}
+.card h1,.card h2{color:var(--primary-color);margin-bottom:15px;text-shadow:0 0 10px var(--primary-color);}
+.card p{line-height:1.6;color:var(--text-color);}
+#slideshow{
+  width:100%;height:250px;border-radius:15px;background:#222;display:flex;align-items:center;
+  justify-content:center;overflow:hidden;position:relative;
+}
+#slideshow img,#slideshow video{
+  width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;
+  opacity:0;transition:opacity 1s ease-in-out;
+}
+#slideshow img.active,#slideshow video.active{opacity:1;z-index:1;}
+#slideshow video{cursor:pointer;}
+.social-section{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;}
+.social-section button,.social-section a.social-btn{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(90deg,var(--primary-color),var(--secondary-color));border:none;padding:12px 20px;border-radius:10px;color:#fff;cursor:pointer;transition:0.3s;text-decoration:none;font-weight:600;}
+.social-section button:hover,.social-section a.social-btn:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 0 20px var(--primary-color),0 0 25px var(--secondary-color);}
+.subscription{display:flex;flex-wrap:wrap;gap:5px;}
+.subscription input{padding:12px 15px;border-radius:10px 0 0 10px;border:none;width:250px;outline:none;}
+.subscription button{padding:12px 20px;border-radius:0 10px 10px 0;border:none;background:linear-gradient(90deg,var(--primary-color),var(--secondary-color));color:#fff;cursor:pointer;}
+footer{padding:20px;text-align:center;background:var(--card-bg);border-top:2px solid rgba(255,255,255,0.1);border-radius:10px;margin-top:30px;}
+#changePasswordModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(5px);justify-content:center;align-items:center;z-index:3000;}
+#changePasswordModal .modal-content{background:var(--card-bg);padding:30px;border-radius:20px;max-width:400px;width:90%;position:relative;box-shadow:0 10px 25px rgba(0,0,0,0.6);}
+#changePasswordModal .modal-content h3{color:var(--primary-color);margin-bottom:20px;text-align:center;}
+#changePasswordModal .modal-content input{width:100%;padding:12px;margin-bottom:15px;border-radius:10px;border:none;background:rgba(255,255,255,0.1);color:var(--text-color);}
+#changePasswordModal .modal-content button{width:100%;padding:12px;background:linear-gradient(90deg,var(--primary-color),var(--secondary-color));border:none;color:#fff;border-radius:10px;cursor:pointer;}
+#changePasswordModal .close-modal{position:absolute;top:15px;right:15px;font-size:1.5em;cursor:pointer;color:var(--secondary-color);}
+.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;}
+.price-card{background:var(--card-bg);border-radius:15px;padding:20px;text-align:center;border:2px solid rgba(255,255,255,0.1);transition:0.3s;position:relative;}
+.price-card:hover{transform:translateY(-5px);box-shadow:0 8px 20px rgba(0,0,0,0.3);}
+.price-card h3{color:var(--primary-color);margin-bottom:10px;}
+.price-card .price{font-size:22px;font-weight:700;color:var(--secondary-color);margin:10px 0;}
+.price-card p{font-size:14px;margin-bottom:15px;color:var(--text-color);}
+.price-card .btn{display:inline-block;padding:10px 18px;border-radius:8px;background:linear-gradient(90deg,var(--primary-color),var(--secondary-color));color:#fff;font-weight:700;text-decoration:none;border:none;cursor:pointer;}
+.best-value{border:2px solid #27ae60;}
+.best-value::before{content:"⭐ Best Value";position:absolute;top:-12px;right:10px;background:#27ae60;color:#fff;font-size:12px;padding:3px 8px;border-radius:5px;font-weight:700;}
+@media(max-width:768px){.sidebar{width:70%;}.subscription input{width:180px;}#slideshow{height:200px;}.main-container{margin:60px 10px;}}
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div id="sidebarToggle"><i class="fas fa-bars"></i><span>Menu</span></div>
+  <img src="default-profile.png" id="profilePic" class="profile-pic" alt="Profile">
+</header>
+<div id="sidebarOverlay"></div>
+
+<div class="sidebar" id="sidebar">
+  <i class="fas fa-times close-btn" id="closeSidebar"></i>
+  <a href="#"><i class="fas fa-home"></i> Home</a>
+  <a href="#" id="uploadProfile"><i class="fas fa-user-circle"></i> Upload Profile Picture</a>
+  <a href="#" id="changePasswordLink"><i class="fas fa-key"></i> Change Password</a>
+  <a href="freeweb.html"><i class="fas fa-laptop-code"></i> Free Web Dev Tutorials</a>
+  <a href="premium-webdev.html"><i class="fas fa-globe"></i> Premium Web Dev Tutorials</a>
+  <a href="premium-programming.html"><i class="fas fa-code"></i> Premium Programming Tutorials</a>
+  <a href="premium-graphics.html"><i class="fas fa-paint-brush"></i> Premium Graphics Design Tutorials</a>
+  <a href="ai.html"><i class="fas fa-robot"></i> Premium AI Tutorials</a>
+  <a href="christians.html"><i class="fas fa-pray"></i> Christians Videos</a>
+  <a href="poultry.html"><i class="fas fa-dove"></i> Poultry Videos</a>
+  <a href="update.html"><i class="fas fa-bell"></i> Check Updates Here</a>
+  <details>
+    <summary style="color:var(--secondary-color); font-weight:700; margin-top:10px;"><i class="fas fa-upload"></i> Uploads</summary>
+    <a href="uploadpro.html">Upload Pro</a>
+    <a href="uploadgra.html">Upload Gra</a>
+    <a href="uploadfree.html">Upload Free</a>
+    <a href="uploadai.html">Upload AI</a>
+    <a href="uploadupdate.html">Upload Update</a>
+    <a href="uploadc.html">Upload C</a>
+    <a href="uploadweb.html">Upload Web</a>
+    <a href="uploadimag.html">Upload Img</a>
+    <a href="uploadp.html">Upload PT</a>
+    <a href="gracode.html">Gra D</a>
+    <a href="procode.html">Prod</a>
+    <a href="webcode.html">WebD</a>
+    <a href="aicode.html">AI D</a>
+  </details>
+  <a href="index.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<div id="changePasswordModal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h3>Change Password</h3>
+    <input type="password" id="oldPassword" placeholder="Old Password">
+    <input type="password" id="newPassword" placeholder="New Password">
+    <button id="changePasswordBtn">Update Password</button>
+  </div>
+</div>
+
+<div class="main-container">
+  <div class="card welcome-card">
+    <h1>Welcome to Nater’s Learning Hub</h1>
+    <p>Join a community of learners and creators. Master web development, design, and programming, and bring your ideas to life!</p>
+  </div>
+
+  <div class="card">
+    <h2>Latest Media Slides</h2>
+    <div id="slideshow">Loading slideshow...</div>
+  </div>
+
+  <div class="card">
+    <h2>Our Premium Tutorials</h2>
+    <div class="price-grid">
+      <div class="price-card"><h3>Graphics</h3><div class="price">₦2,999</div><p>Photoshop, Canva, CorelDraw & more.</p><a class="btn" href="premium-graphics.html">Get started</a></div>
+      <div class="price-card best-value"><h3>Web Development</h3><div class="price">₦3,999</div><p>HTML, CSS & JS to build real websites.</p><a class="btn" href="premium-webdev.html">Get started</a></div>
+      <div class="price-card"><h3>AI Tutorials</h3><div class="price">₦4,999</div><p>Python, AI tools & ML concepts.</p><a class="btn" href="ai.html">Get started</a></div>
+      <div class="price-card"><h3>Programming</h3><div class="price">₦4,999</div><p>Deep dive into Python, PHP & algorithms.</p><a class="btn" href="premium-programming.html">Get started</a></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Get in Touch / Complaints or Advice</h2>
+    <div class="social-section">
+      <button onclick="window.open('https://www.facebook.com/Natercode','_blank')"><i class="fab fa-facebook-f"></i> Facebook</button>
+      <button onclick="window.open('https://tiktok.com/@nater.mbashau2','_blank')"><i class="fab fa-tiktok"></i> TikTok</button>
+      <button onclick="window.location.href='mailto:Nmbashau@gmail.com'"><i class="fas fa-envelope"></i> Email</button>
+      <button onclick="window.open('https://wa.me/2348160979620', '_blank')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+      <button onclick="window.open('https://youtube.com/@natermbashau-k7n','_blank')"><i class="fab fa-youtube"></i> YouTube</button>
+      <a href="paystack.html" class="social-btn">💸💰 Support via Paystack</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Subscribe</h2>
+    <div class="subscription">
+      <input type="email" id="subscriberEmail" placeholder="Enter your email to subscribe">
+      <button id="subscribeBtn">Subscribe</button>
+    </div>
+  </div>
+</div>
+
+<footer>&copy; 2025 Nater's Learning Hub. All rights reserved.</footer>
+
+<script>
+Backendless.initApp("EC3F680C-888B-4849-A309-C6BBA192EF6E","F2685256-D127-4363-B348-94D386889B02");
+Backendless.serverURL = "https://api.backendless.com";
+
+/* Sidebar Toggle */
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+document.getElementById('sidebarToggle').addEventListener('click', ()=>{sidebar.classList.add('open'); overlay.style.display='block';});
+document.getElementById('closeSidebar').addEventListener('click', ()=>{sidebar.classList.remove('open'); overlay.style.display='none';});
+overlay.addEventListener('click', ()=>{sidebar.classList.remove('open'); overlay.style.display='none';});
+
+/* Slideshow */
+let slides=[], slideIndex=0;
+async function loadSlides(){
+  try{
+    const media = await Backendless.Data.of("media").find();
+    slides = media.filter(item=>item.url && item.type);
+    if(slides.length==0){document.getElementById('slideshow').innerText="No media uploaded yet."; return;}
+    showSlide(0);
+    setInterval(()=>{slideIndex=(slideIndex+1)%slides.length; showSlide(slideIndex);},30000);
+  }catch(err){console.error(err); document.getElementById('slideshow').innerText="Error loading media.";}
+}
+
+function showSlide(i){
+  const container = document.getElementById('slideshow');
+  const item = slides[i];
+  if(!item || !item.url) return;
+  let element;
+  if(item.type.toLowerCase().includes('video')){
+    element = document.createElement('video');
+    element.src = item.url;
+    element.autoplay = true; element.loop = true; element.muted=true; element.controls=false;
+  } else {
+    element = document.createElement('img');
+    element.src = item.url;
+    element.onerror = ()=>{ slideIndex=(slideIndex+1)%slides.length; showSlide(slideIndex); };
+  }
+  element.classList.add('active');
+  container.appendChild(element);
+
+  // Fade out previous slides
+  const previous = container.querySelectorAll(':scope > *:not(.active)');
+  previous.forEach(prev=>{
+    prev.style.opacity = 0;
+    setTimeout(()=>prev.remove(),1000); // match transition
+  });
+}
+loadSlides();
+
+/* Profile Upload */
+document.getElementById('uploadProfile').addEventListener('click', ()=>{
+  const input=document.createElement('input');
+  input.type='file'; input.accept='image/*';
+  input.onchange=async e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      const saved=await Backendless.Files.upload(file,'profile-pics',true);
+      document.getElementById('profilePic').src = saved.fileURL;
+      alert("Profile picture updated!");
+    }catch(err){console.error(err); alert("Upload failed.");}
+  };
+  input.click();
+});
+
+/* Change Password */
+const modal = document.getElementById('changePasswordModal');
+document.getElementById('changePasswordLink').addEventListener('click', e=>{e.preventDefault(); modal.style.display='flex';
+    });
+document.querySelector('#changePasswordModal .close-modal').addEventListener('click', ()=>modal.style.display='none');
+window.addEventListener('click', e=>{if(e.target==modal) modal.style.display='none';});
+document.getElementById('changePasswordBtn').addEventListener('click', async ()=>{
+  const oldP=document.getElementById('oldPassword').value;
+  const newP=document.getElementById('newPassword').value;
+  if(!oldP || !newP){alert("Fill both fields"); return;}
+  try{
+    const user=await Backendless.UserService.getCurrentUser();
+    if(!user){alert("User not logged in"); return;}
+    // Optional: validate old password if stored separately
+    await Backendless.UserService.update({objectId: user.objectId, password: newP});
+    alert("Password updated successfully!");
+    modal.style.display='none';
+  }catch(err){console.error(err); alert("Failed to update password.");}
+});
+
+/* Subscription */
+document.getElementById('subscribeBtn').addEventListener('click', async ()=>{
+  const email=document.getElementById('subscriberEmail').value.trim();
+  if(!email || !email.includes('@')){alert("Enter a valid email"); return;}
+  try{
+    await Backendless.Data.of("subscribers").save({email: email});
+    alert("Thank you for subscribing!");
+    document.getElementById('subscriberEmail').value='';
+  }catch(err){console.error(err); alert("Subscription failed.");}
+});
+</script>
+
+</body>
+</html>
+    
+    
+    

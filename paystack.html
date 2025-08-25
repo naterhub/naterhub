@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pay with Paystack - Nater's Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1e1e2d, #000);
+      color: #e0e0e0;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .card {
+      background: #2a2a3e;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+    h1 { color: #ff6b6b; margin-bottom: 20px; }
+    input {
+      width: 100%; padding: 12px; margin-bottom: 15px;
+      border-radius: 10px; border: none;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    button {
+      width: 100%; padding: 12px;
+      border: none; border-radius: 10px;
+      background: linear-gradient(90deg, #ff6b6b, #48e5c2);
+      color: #fff; font-weight: 600; cursor: pointer;
+    }
+    button:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Pay with Paystack</h1>
+  <input type="email" id="email" placeholder="Enter your email" required>
+  <input type="number" id="amount" placeholder="Enter amount (₦)" required>
+  <button onclick="payWithPaystack()">Pay Now</button>
+</div>
+
+<script>
+Backendless.initApp(
+  "6CCDB29E-0A2A-41D4-994C-5D69186F398E",
+  "B3C2C782-37CB-4123-BB10-4F5E32218668"
+);
+Backendless.serverURL = "https://api.backendless.com";
+
+function payWithPaystack(){
+  const email = document.getElementById("email").value.trim();
+  const amount = parseInt(document.getElementById("amount").value.trim()) * 100; // kobo
+
+  if(!email || !email.includes("@") || !amount){
+    alert("Please enter valid details");
+    return;
+  }
+
+  let handler = PaystackPop.setup({
+    key: "pk_live_e4550ea9879afc005733e9f2be957500e1999d8c", // PUBLIC key only
+    email: email,
+    amount: amount,
+    currency: "NGN",
+    callback: function(response){
+      alert("Payment successful! Ref: " + response.reference);
+      // Save transaction in Backendless
+      Backendless.Data.of("transactions").save({
+        email: email,
+        amount: amount/100,
+        reference: response.reference,
+        status: "success",
+        date: new Date()
+      })
+      .then(()=> alert("Transaction saved in database ✅"))
+      .catch(err=> console.error("Save error", err));
+    },
+    onClose: function(){
+      alert("Payment window closed.");
+    }
+  });
+  handler.openIframe();
+}
+</script>
+
+</body>
+</html>

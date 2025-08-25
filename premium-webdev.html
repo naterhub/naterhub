@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Web Dev Videos</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
+<style>
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #48e5c2;
+  --dark-bg: #1e1e2d;
+  --card-bg: #2a2a3e;
+  --text-color: #e0e0e0;
+}
+
+* { box-sizing: border-box; margin:0; padding:0; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, var(--dark-bg) 0%, #000000 100%);
+  color: var(--text-color);
+  min-height: 100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px;
+}
+
+/* Cards */
+.card {
+  background: var(--card-bg);
+  border-radius:20px;
+  padding:20px;
+  margin:15px 0;
+  box-shadow:0 10px 25px rgba(0,0,0,0.4);
+  border:2px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(5px);
+  width:100%;
+  max-width:800px;
+  text-align:center;
+}
+
+.card h3 { color: var(--primary-color); margin-bottom:15px; }
+
+input, button {
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border:none;
+  width:100%;
+  max-width:300px;
+  font-size:1em;
+}
+
+button {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  color:#fff;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
+}
+
+button:hover { transform:scale(1.05); box-shadow:0 0 20px var(--primary-color),0 0 25px var(--secondary-color); }
+
+#videoContainer video { width:100%; border-radius:10px; margin-top:10px; }
+
+#message {
+  margin-top:15px;
+  font-weight:600;
+}
+
+/* WhatsApp Button */
+a.whatsapp-btn button {
+  background:#25D366;
+  width:auto;
+  padding:12px 25px;
+  margin-top:10px;
+}
+
+/* Copy button styling */
+.copy-container {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin:10px 0;
+}
+
+.copy-btn {
+  padding:6px 12px;
+  background: var(--secondary-color);
+  color:#000;
+  border-radius:8px;
+  font-size:0.9em;
+  cursor:pointer;
+  border:none;
+  transition:0.3s;
+}
+
+.copy-btn:hover {
+  background: var(--primary-color);
+  color:#fff;
+}
+</style>
+</head>
+<body>
+
+<h1>Premium Web Dev Videos</h1>
+
+<div id="accessForm" class="card">
+  <h3>Gain access by paying ₦3,999 to this OPay account:</h3>
+  <p>Account Name: <strong>Nater Mbashau</strong></p>
+  
+  <div class="copy-container">
+  <p>Ac No:: <strong id="accountNumber">8160979620 </strong></p>
+    <button class="copy-btn" onclick="copyAccount()">Copy</button>
+    
+    
+  </div>
+  
+    <div class="copy-container">
+        
+         
+     <p>paystack payment<strong id="accountNumber">fast</strong></p>
+    <button class="copy-btn"><a href="paystack.html">💰💸paystack pay here</a></button>
+    
+       </div>
+     
+    
+  
+  <a class="whatsapp-btn" href="https://wa.me/2348160979620" target="_blank"><button>💬 Chat with admin for code</button></a>
+  
+  <h3>Enter your credentials below:</h3>
+  <input type="email" id="email" placeholder="Enter your email">
+  <input type="text" id="code" placeholder="Enter your access code">
+  <button onclick="verifyAccess()">Unlock Videos</button>
+  <div id="message"></div>
+</div>
+
+<div id="videoContainer"></div>
+
+<script>
+Backendless.serverURL = "https://api.backendless.com";
+Backendless.initApp(
+    "EC3F680C-888B-4849-A309-C6BBA192EF6E",   // app ID
+    "F2685256-D127-4363-B348-94D386889B02"    // API key
+);
+
+// ✅ Copy account number
+function copyAccount() {
+    const accNumber = document.getElementById("accountNumber").textContent;
+    navigator.clipboard.writeText(accNumber).then(() => {
+        alert("✅ Account number copied: " + accNumber);
+    }).catch(err => {
+        console.error("Copy failed:", err);
+    });
+}
+
+async function verifyAccess() {
+    const email = document.getElementById('email').value.trim().toLowerCase();
+    const code = document.getElementById('code').value.trim();
+    const message = document.getElementById('message');
+    const container = document.getElementById('videoContainer');
+    const accessForm = document.getElementById('accessForm');
+
+    container.innerHTML = '';
+    message.innerHTML = '';
+
+    if (!email || !code) {
+        message.innerHTML = `<p style="color:#ff6b6b;">❌ Enter both email and code.</p>`;
+        return;
+    }
+
+    try {
+        // ✅ FIXED: Check only against PremiumWebDev_Codes table
+        const queryBuilder = Backendless.DataQueryBuilder.create().setWhereClause(
+            `email = '${email}' AND code = '${code}'`
+        );
+
+        const result = await Backendless.Data.of("PremiumWebDev_Codes").find(queryBuilder);
+
+        if (result.length === 0) {
+            message.innerHTML = `<p style="color:#ff6b6b;">❌ Access Denied: Invalid email or code.</p>`;
+            return;
+        }
+
+        // ✅ Valid credentials
+        accessForm.style.display = 'none';
+        message.innerHTML = `<p style="color:var(--secondary-color);">✅ Access Granted! Loading your videos...</p>`;
+
+        // ✅ Load videos only from PremiumWebDevVideos
+        const videos = await Backendless.Data.of("PremiumWebDevVideos").find(
+            Backendless.DataQueryBuilder.create().setSortBy(["created DESC"])
+        );
+
+        const playableVideos = videos.filter(v => v.url && v.url.endsWith(".mp4"));
+
+        if (playableVideos.length === 0) {
+            container.innerHTML = "<p>No playable videos available.</p>";
+            return;
+        }
+
+        playableVideos.forEach(v => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<h3>${v.title || "Web Dev Tutorial"}</h3>
+                <video controls controlsList="nodownload">
+                  <source src="${v.url}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>`;
+            container.appendChild(card);
+        });
+
+    } catch(err) {
+        console.error(err);
+        message.innerHTML = `<p style="color:#ff6b6b;">❌ Error verifying access. Videos remain hidden.</p>`;
+    }
+}
+</script>
+
+</body>
+</html>

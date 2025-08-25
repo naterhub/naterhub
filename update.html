@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Latest Updates</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
+<style>
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #48e5c2;
+  --card-bg: #2a2a3e;
+  --text-color: #e0e0e0;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg,#1e1e2d 0%,#000 100%);
+  color: var(--text-color);
+  min-height: 100vh;
+  padding: 20px;
+}
+.update-card {
+  background: var(--card-bg);
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.3);
+}
+.update-card img {
+  max-width:100%;
+  border-radius:10px;
+  margin-top:10px;
+}
+.new-badge {
+  background: #28a745;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+
+/* Pop-up Notification */
+#notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--primary-color);
+  color: #fff;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.4);
+  display: none;
+  z-index: 9999;
+  font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<h1 style="color:var(--primary-color); text-align:center; margin-bottom:20px;">Latest Updates</h1>
+<div id="updatesContainer"></div>
+
+<div id="notification"></div>
+
+<script>
+const APP_ID = "EC3F680C-888B-4849-A309-C6BBA192EF6E";
+const API_KEY = "F2685256-D127-4363-B348-94D386889B02";
+Backendless.serverURL = "https://api.backendless.com";
+Backendless.initApp(APP_ID, API_KEY);
+
+async function showUpdates(){
+  try{
+    const updates = await Backendless.Data.of("Updates").find({ sortBy: "date DESC" });
+    const container = document.getElementById("updatesContainer");
+    container.innerHTML = "";
+
+    const lastSeen = localStorage.getItem("lastSeenUpdateDate");
+    let hasNew = false;
+
+    updates.forEach(u => {
+      const updateDate = new Date(u.date);
+      const isNew = !lastSeen || new Date(lastSeen) < updateDate;
+      if(isNew && !hasNew) hasNew = true;
+
+      container.innerHTML += `
+        <div class="update-card">
+          <h3>${u.title} ${isNew ? '<span class="new-badge">NEW</span>' : ''}</h3>
+          <p>${u.description}</p>
+          ${u.image ? `<img src="${u.image}" alt="Update Image">` : ''}
+          <small>${updateDate.toLocaleString()}</small>
+        </div>
+      `;
+    });
+
+    if(updates.length > 0){
+      localStorage.setItem("lastSeenUpdateDate", updates[0].date);
+    }
+
+    // Show pop-up notification if there are new updates
+    if(hasNew){
+      showNotification("📢 New update available!");
+    }
+
+  } catch(err){
+    console.error(err);
+    document.getElementById("updatesContainer").innerHTML = "<p style='color:red;'>Error loading updates.</p>";
+  }
+}
+
+function showNotification(message){
+  const notif = document.getElementById("notification");
+  notif.innerText = message;
+  notif.style.display = "block";
+  setTimeout(() => { notif.style.display = "none"; }, 5000); // hide after 5 seconds
+}
+
+showUpdates();
+</script>
+
+</body>
+</html>

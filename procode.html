@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Code Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
+<style>
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #48e5c2;
+  --dark-bg: #1e1e2d;
+  --card-bg: #2a2a3e;
+  --text-color: #e0e0e0;
+}
+
+* { box-sizing: border-box; margin:0; padding:0; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, var(--dark-bg) 0%, #000000 100%);
+  color: var(--text-color);
+  min-height: 100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px;
+}
+
+h1 { color: var(--primary-color); margin-bottom:20px; }
+
+.card {
+  background: var(--card-bg);
+  border-radius:20px;
+  padding:20px;
+  margin:15px 0;
+  box-shadow:0 10px 25px rgba(0,0,0,0.4);
+  border:2px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(5px);
+  width:100%;
+  max-width:500px;
+  text-align:center;
+}
+
+.card h3 { color: var(--primary-color); margin-bottom:15px; }
+
+input, button {
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border:none;
+  width:100%;
+  font-size:1em;
+}
+
+button {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  color:#fff;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
+}
+
+button:hover { transform:scale(1.05); box-shadow:0 0 20px var(--primary-color),0 0 25px var(--secondary-color); }
+
+#message { margin-top:15px; font-weight:600; text-align:center; }
+</style>
+</head>
+<body>
+
+<h1>Pro CG</h1>
+
+<div id="loginForm" class="card">
+  <h3>Admin Login</h3>
+  <input type="email" id="adminEmail" placeholder="Enter admin email">
+  <input type="password" id="adminPassword" placeholder="Enter password">
+  <button onclick="adminLogin()">Login</button>
+  <div id="loginMessage"></div>
+</div>
+
+<div id="generatorForm" class="card" style="display:none;">
+  <h3>Generate User Access Code</h3>
+  <input type="email" id="userEmail" placeholder="Enter user email">
+  <button onclick="generateCode()">Generate Code</button>
+  <div id="message"></div>
+  <div id="generatedCode" style="margin-top:15px; font-weight:bold;"></div>
+</div>
+
+<script>
+Backendless.serverURL = "https://api.backendless.com";
+Backendless.initApp(
+    "EC3F680C-888B-4849-A309-C6BBA192EF6E",
+    "F2685256-D127-4363-B348-94D386889B02"
+);
+
+// ✅ Admin login using Backendless user authentication
+async function adminLogin() {
+    const email = document.getElementById('adminEmail').value.trim().toLowerCase();
+    const password = document.getElementById('adminPassword').value.trim();
+    const loginMessage = document.getElementById('loginMessage');
+
+    loginMessage.innerHTML = '';
+
+    if(!email || !password){
+        loginMessage.innerHTML = `<p style="color:#ff6b6b;">❌ Enter both email and password.</p>`;
+        return;
+    }
+
+    try {
+        // Backendless login
+        const user = await Backendless.UserService.login(email, password, true);
+
+        if(user.email !== "nmbashau@gmail.com"){
+            loginMessage.innerHTML = `<p style="color:#ff6b6b;">❌ You are not authorized as admin.</p>`;
+            await Backendless.UserService.logout(); // log out unauthorized user
+            return;
+        }
+
+        // ✅ Authorized admin
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('generatorForm').style.display = 'block';
+        loginMessage.innerHTML = `<p style="color:var(--secondary-color);">✅ Welcome Admin!</p>`;
+
+    } catch(err){
+        console.error(err);
+        loginMessage.innerHTML = `<p style="color:#ff6b6b;">❌ Invalid login credentials.</p>`;
+    }
+}
+
+// ✅ Generate a unique code for a user and save in Backendless
+async function generateCode() {
+    const email = document.getElementById('userEmail').value.trim().toLowerCase();
+    const message = document.getElementById('message');
+    const generatedCode = document.getElementById('generatedCode');
+
+    message.innerHTML = '';
+    generatedCode.innerHTML = '';
+
+    if(!email){
+        message.innerHTML = `<p style="color:#ff6b6b;">❌ Enter a user email.</p>`;
+        return;
+    }
+
+    const code = Math.random().toString(36).substring(2,10).toUpperCase();
+
+    try {
+        await Backendless.Data.of("PremiumProgrammingCodes").save({
+            email: email,
+            code: code
+        });
+
+        message.innerHTML = `<p style="color:var(--secondary-color);">✅ Code generated successfully!</p>`;
+        generatedCode.innerHTML = `User: ${email} <br> Access Code: ${code}`;
+    } catch(err){
+        console.error(err);
+        message.innerHTML = `<p style="color:#ff6b6b;">❌ Error generating code. Check console.</p>`;
+    }
+}
+</script>
+
+</body>
+</html>

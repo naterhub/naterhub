@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Web Dev Videos</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
+<style>
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #48e5c2;
+  --bg-color: #1e1e2d;
+  --card-bg: #2a2a3e;
+  --text-color: #e0e0e0;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg,#1e1e2d 0%,#000 100%);
+  color: var(--text-color);
+  min-height: 100vh;
+  display:flex; justify-content:center; align-items:center;
+  flex-direction: column;
+  padding: 20px;
+}
+h1 { 
+  color: var(--primary-color); 
+  margin-bottom: 30px; 
+  text-align: center;
+}
+#videoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+}
+.card {
+  background: var(--card-bg);
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 5px 20px rgba(0,0,0,0.4);
+  margin:15px 0;
+  width: 100%;
+  text-align: center;
+}
+video {
+  width: 100%;
+  max-width: 100%;
+  border-radius:10px;
+  margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<h1>Free Web Dev Videos</h1>
+<div id="videoContainer"></div>
+
+<script>
+Backendless.serverURL = "https://api.backendless.com";
+Backendless.initApp("EC3F680C-888B-4849-A309-C6BBA192EF6E","F2685256-D127-4363-B348-94D386889B02");
+
+async function loadVideos(){
+  const container = document.getElementById('videoContainer');
+  container.innerHTML = "<p>Loading videos...</p>";
+
+  try {
+    const videos = await Backendless.Data.of("FreeWebDevVideos").find({sortBy: ["created DESC"]});
+    container.innerHTML = '';
+
+    // Filter only playable videos (.mp4)
+    const playableVideos = videos.filter(v => v.url && v.url.endsWith(".mp4"));
+
+    if(playableVideos.length === 0){
+      container.innerHTML = "<p>No playable videos available.</p>";
+      return;
+    }
+
+    playableVideos.forEach(v => {
+      const card = document.createElement('div');
+      card.className = "card";
+      card.innerHTML = `
+        <h3>${v.title}</h3>
+        <video controls controlsList="nodownload">
+          <source src="${v.url}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      `;
+      container.appendChild(card);
+    });
+
+  } catch(err){
+    console.error(err);
+    container.innerHTML = "<p>Failed to load videos.</p>";
+  }
+}
+
+loadVideos();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poultry Videos</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
+<style>
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #48e5c2;
+  --card-bg: #2a2a3e;
+  --text-color: #e0e0e0;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg,#1e1e2d 0%,#000 100%);
+  color: var(--text-color);
+  min-height: 100vh;
+  padding:20px;
+}
+.card {
+  background: var(--card-bg);
+  padding:20px;
+  border-radius:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.4);
+  margin-bottom:20px;
+}
+h2 { color: var(--primary-color); margin-bottom:15px; }
+video { width:100%; border-radius:15px; margin-top:10px; }
+</style>
+</head>
+<body>
+
+<h1 style="text-align:center; color:var(--primary-color); margin-bottom:30px;">Poultry Videos</h1>
+<div id="videoList"></div>
+
+<script>
+const APP_ID = "EC3F680C-888B-4849-A309-C6BBA192EF6E";
+const API_KEY = "F2685256-D127-4363-B348-94D386889B02";
+Backendless.serverURL = "https://api.backendless.com";
+Backendless.initApp(APP_ID, API_KEY);
+
+async function loadVideos() {
+  const VideoTable = Backendless.Data.of("PoultryVideos");
+  const videos = await VideoTable.find();
+  const container = document.getElementById("videoList");
+  container.innerHTML = "";
+
+  videos.forEach(video => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <h2>${video.title}</h2>
+      <video controls>
+        <source src="${video.fileUrl}" type="video/mp4">
+        Your browser does not support HTML5 video.
+      </video>
+    `;
+    container.appendChild(card);
+  });
+}
+
+loadVideos();
+</script>
+
+</body>
+</html>

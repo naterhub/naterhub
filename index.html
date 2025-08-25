@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Dev & Design Hub - Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+:root {
+    --primary-color: #ff6b6b;
+    --secondary-color: #48e5c2;
+    --dark-bg: #1e1e2d;
+    --card-bg: #2a2a3e;
+    --text-color: #e0e0e0;
+    --shadow-light: rgba(255, 255, 255, 0.08);
+    --shadow-dark: rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1e1e2d 0%, #000000 100%);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.container {
+    position: relative;
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 
+        0 15px 30px var(--shadow-dark), 
+        inset 0 0 10px var(--shadow-light);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    animation: pulse-border 4s infinite cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+@keyframes pulse-border {
+    0% { transform: scale(1); box-shadow: 0 0 15px var(--primary-color); }
+    50% { transform: scale(1.02); box-shadow: 0 0 30px var(--primary-color), 0 0 40px var(--secondary-color); }
+    100% { transform: scale(1); box-shadow: 0 0 15px var(--primary-color); }
+}
+
+h2 {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
+    margin-bottom: auto;
+}
+
+.intro-message {
+    margin-top: 0;
+    color: var(--text-color);
+    font-size: 0.9em;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.form-group i {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.form-group .icon-left {
+    left: 15px;
+    color: var(--secondary-color);
+}
+
+.form-group .icon-right {
+    right: 15px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 12px 12px 45px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input#password {
+    padding-right: 45px;
+}
+
+.form-group input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 15px var(--secondary-color);
+}
+
+.form-group input:focus ~ .icon-left,
+.form-group input:focus ~ .icon-right {
+    transform: translateY(-50%) scale(1.1);
+    color: var(--primary-color);
+}
+
+.glow-button {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    color: #fff;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px var(--primary-color);
+    transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    animation: pulse-button 2s infinite;
+    width: 100%;
+}
+
+.glow-button:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 25px var(--primary-color), 0 0 40px var(--secondary-color);
+}
+
+@keyframes pulse-button {
+    0% { box-shadow: 0 0 15px var(--primary-color); }
+    50% { box-shadow: 0 0 25px var(--primary-color); }
+    100% { box-shadow: 0 0 15px var(--primary-color); }
+}
+
+.register-link, .forgot-link {
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+
+.register-link a, .forgot-link a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.register-link a:hover, .forgot-link a:hover {
+    color: var(--primary-color);
+    text-shadow: 0 0 8px var(--primary-color);
+}
+
+#message {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.success {
+    background-color: #2e4d3c;
+    color: #7affc8;
+    box-shadow: 0 0 10px #7affc8;
+}
+
+.error {
+    background-color: #5d3131;
+    color: #ff9f9f;
+    box-shadow: 0 0 10px #ff9f9f;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Welcome Back to Nater's learning center</h2>
+  <p class="intro-message">
+    Log in to access Web Dev, Design, Programming ,and Ai tutorials.
+  </p>
+  
+  <form id="loginForm">
+    <div class="form-group">
+      <input type="email" id="email" placeholder="Email" required>
+      <i class="fas fa-envelope icon-left"></i>
+    </div>
+    <div class="form-group">
+      <input type="password" id="password" placeholder="Password" required>
+      <i class="fas fa-lock icon-left"></i>
+      <i class="fas fa-eye icon-right" id="togglePassword"></i>
+    </div>
+    <button type="submit" class="glow-button">Login</button>
+  </form>
+
+  <div class="forgot-link">
+    <a href="#" id="forgotPassword">Forgot Password?</a>
+  </div>
+  
+  <div class="register-link">
+    Don't have an account? <a href="register.html">Register</a>
+  </div>
+
+  <div id="message"></div>
+</div>
+
+<!-- Backendless SDK -->
+<script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
+<script>
+Backendless.serverURL = "https://api.backendless.com";
+Backendless.initApp(
+  "EC3F680C-888B-4849-A309-C6BBA192EF6E",
+  "F2685256-D127-4363-B348-94D386889B02"
+);
+
+const loginForm = document.getElementById("loginForm");
+const messageBox = document.getElementById("message");
+
+// Login
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    await Backendless.UserService.login(email, password, true);
+    messageBox.style.display = "block";
+    messageBox.className = "success";
+    messageBox.innerText = "✅ Login successful! Redirecting...";
+
+    setTimeout(() => {
+      window.location.href = "home.html";
+    }, 2000);
+
+  } catch (error) {
+    messageBox.style.display = "block";
+    messageBox.className = "error";
+    messageBox.innerText = "❌ Error: " + error.message;
+  }
+});
+
+// Toggle password visibility
+const togglePassword = document.getElementById("togglePassword");
+const passwordField = document.getElementById("password");
+
+togglePassword.addEventListener("click", () => {
+  passwordField.type = passwordField.type === "password" ? "text" : "password";
+  togglePassword.classList.toggle("fa-eye-slash");
+});
+
+// Forgot password
+const forgotPassword = document.getElementById("forgotPassword");
+forgotPassword.addEventListener("click", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  if(!email) {
+    messageBox.style.display = "block";
+    messageBox.className = "error";
+    messageBox.innerText = "⚠️ Please enter your email first!";
+    return;
+  }
+
+  try {
+    await Backendless.UserService.restorePassword(email);
+    messageBox.style.display = "block";
+    messageBox.className = "success";
+    messageBox.innerText = "✅ Password reset email sent! Check your inbox.";
+  } catch (error) {
+    messageBox.style.display = "block";
+    messageBox.className = "error";
+    messageBox.innerText = "❌ Error: " + error.message;
+  }
+});
+</script>
+</body>
+</html>
