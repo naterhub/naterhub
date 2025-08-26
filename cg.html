@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Certificate Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #1e1e2d;
+      color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* 🔒 Admin login form */
+    #login-container {
+      background: #2a2a3e;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    #login-container h2 {
+      margin-bottom: 15px;
+      color: #DAA520;
+    }
+    #login-container input, #login-container button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #555;
+      font-size: 1em;
+    }
+    #login-container input {
+      background: #1e1e2d;
+      color: #fff;
+    }
+    #login-container button {
+      background: #DAA520;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+    }
+    #login-container button:hover {
+      background: #FFD700;
+    }
+    #login-message {
+      margin-top: 10px;
+      color: #ff6b6b;
+      font-weight: bold;
+    }
+
+    /* Hide generator until login */
+    #generator-section { display: none; }
+
+    /* Certificate styling (your original styles) */
+    b{ font-size:25px; color:#000; font-family: Monaco; text-align:center; text-transform: uppercase; font-weight:bold; }
+    #certificate-container { width:800px; height:600px; background:linear-gradient(135deg,#fff8e7,#fff); border:12px solid #FFD700; border-radius:15px; box-shadow:0 0 30px rgba(0,0,0,0.7); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; position:relative; font-family:'Times New Roman',serif; padding-top:40px;}
+    #certificate-logo { position:absolute; top:20px; right:20px; width:150px; height:150px;
+    border-radius:50%;
+    overflow: hidden;
+    }
+    #certificate-logo img { width:100%; height:100%; object-fit:cover;
+    border-radius:50%;
+     }
+    #certificate-title { font-size:4em; font-weight:900; color:#DAA520; text-shadow:2px 2px 3px rgba(0,0,0,0.3); margin-bottom:10px; text-align:center;}
+    #certificate-subtitle { font-size:1.8em; font-weight:700; color:#ff6b6b; margin-bottom:20px; text-shadow:1px 1px 2px rgba(0,0,0,0.2); text-align:center;}
+    #certificate-name { font-size:20px; font-family:monaco; font-weight:700; border-bottom:3px solid #DAA520; padding:8px 20px; margin-bottom:20px; color:#222; text-align:center;}
+    #certificate-course { font-size:1.5em; font-weight:800; margin-bottom:40px; text-align:center; width:70%; color:#8098ff;}
+    .signature-section { display:flex; justify-content:center; width:80%; position:absolute; bottom:90px;}
+    .signature-line { text-align:center; font-size:1.em; font-weight:400; color:#111; font-family:'Dancing Script',cursive; font-style:italic;}
+    .signature-line hr { border-top:2px solid #DAA520; width:200px; margin:5px auto;}
+    #cert-date-container { position:absolute; bottom:140px; left:50%; transform:translateX(-50%); font-weight:700; font-size:1.2em; color:#111; text-align:center;}
+    #certificate-id-qr { position:absolute; bottom:20px; left:30px; display:flex; align-items:center; gap:15px; font-weight:700; font-size:0.9em; color:#111;}
+    #qrcodeVerify,#qrcodeMain { width:80px; height:80px; border:2px solid #ddd; box-shadow:0 0 5px rgba(0,0,0,0.3);}
+    .input-group { margin-top:20px; display:flex; flex-direction:column; gap:10px; width:100%; max-width:400px;}
+    input,button { padding:10px; border-radius:5px; border:1px solid #555; background-color:#2a2a3e; color:#e0e0e0; font-size:1em;}
+    button { background-color:#DAA520; color:#fff; border:none; cursor:pointer; transition:0.3s;}
+    button:hover { background-color:#FFD700;}
+  </style>
+</head>
+<body>
+
+<!-- 🔒 Login Form -->
+<div id="login-container">
+  <h2>Admin Login</h2>
+  <input type="email" id="loginEmail" placeholder="Enter Email">
+  <input type="password" id="loginPassword" placeholder="Enter Password">
+  <button id="loginBtn">Login</button>
+  <div id="login-message"></div>
+</div>
+
+<!-- ✅ Generator Section (hidden until admin login) -->
+<div id="generator-section">
+  <div id="certificate-container">
+    <div id="certificate-logo"><img src="logo.png" alt="Logo"></div>
+    <div id="certificate-title">Certificate of Completion</div>
+    <div id="certificate-subtitle">This certifies that</div>
+    <div id="certificate-name">User Name</div>
+    <div id="certificate-course">has successfully completed the<br><b>Web Development</b><br>course on Nater's Learning Hub.</div>
+    <div id="cert-date-container">Date: <span id="cert-date"></span></div>
+    <div class="signature-section"><div class="signature-line"><hr><div>NATER .M (INSTRUCTOR, NATER'S LEARNING HUB)</div></div></div>
+    <div id="certificate-id-qr">
+      <div id="qrcodeVerify"></div>
+      <div id="qrcodeMain"></div>
+      <div>Certificate Code: <span id="certificate-id"></span><br>
+        <a href="#" id="verifyLink" style="color:#DAA520;text-decoration:none;">Verify this certificate</a>
+      </div>
+    </div>
+  </div>
+  <div class="input-group">
+    <input type="text" id="userName" placeholder="Enter user's full name">
+    <input type="text" id="courseName" placeholder="Enter course name (e.g., AI Tutorials)">
+    <button id="generateBtn">Update Certificate</button>
+    <button id="downloadBtn">Download Certificate</button>
+  </div>
+</div>
+
+<!-- ✅ Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
+
+<script>
+Backendless.serverURL = "https://api.backendless.com";
+Backendless.initApp("EC3F680C-888B-4849-A309-C6BBA192EF6E","F2685256-D127-4363-B348-94D386889B02");
+
+// ✅ LOGIN CHECK
+const loginBtn = document.getElementById("loginBtn");
+loginBtn.addEventListener("click", () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+
+  Backendless.UserService.login(email, password, true)
+    .then(user => {
+      if(user.email === "nmbashau@gmail.com"){
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("generator-section").style.display = "block";
+      } else {
+        document.getElementById("login-message").innerText = "❌ Unauthorized. Only super admin can login.";
+        Backendless.UserService.logout();
+      }
+    })
+    .catch(err => {
+      document.getElementById("login-message").innerText = "❌ Login failed: " + err.message;
+    });
+});
+
+// ✅ CERTIFICATE GENERATOR SCRIPT (same as before)
+document.addEventListener('DOMContentLoaded', () => {
+  const verifyDomain = "https://naterhub.github.io/naterhubvarify/";
+  const mainDomain = "https://naterhub.github.io/naterhub/";
+
+  function generateCertificateID() {
+    const now = new Date();
+    return `NATER-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${now.getTime()}`;
+  }
+  function updateQRCodes(certId) {
+    document.getElementById("qrcodeVerify").innerHTML = "";
+    document.getElementById("qrcodeMain").innerHTML = "";
+    new QRCode(document.getElementById("qrcodeVerify"), { text: `${verifyDomain}?code=${certId}`, width: 80, height: 80 });
+    new QRCode(document.getElementById("qrcodeMain"), { text: mainDomain, width: 80, height: 80 });
+  }
+  function saveToBackendless(name, course, certId, date) {
+    const Certificate = { studentName: name, courseName: course, certCode: certId, issueDate: date };
+    Backendless.Data.of("StudentCertificate").save(Certificate)
+      .then(saved => console.log("✅ Saved:", saved))
+      .catch(err => console.error("❌ Save error:", err));
+  }
+
+  const generateBtn = document.getElementById('generateBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const certName = document.getElementById('certificate-name');
+  const certCourse = document.getElementById('certificate-course');
+  const certDate = document.getElementById('cert-date');
+  const certID = document.getElementById('certificate-id');
+  const verifyLink = document.getElementById('verifyLink');
+  const userNameInput = document.getElementById('userName');
+  const courseNameInput = document.getElementById('courseName');
+
+  generateBtn.addEventListener('click', () => {
+    const newCertId = generateCertificateID();
+    const name = userNameInput.value || "User Name";
+    const course = courseNameInput.value || "Web Development";
+    const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+
+    certName.innerText = name;
+    certCourse.innerHTML = `has successfully completed the <b>${course}</b> course on Nater's Learning Hub.`;
+    certID.innerText = newCertId;
+    certDate.innerText = date;
+    verifyLink.href = `${verifyDomain}?code=${newCertId}`;
+
+    updateQRCodes(newCertId);
+    saveToBackendless(name, course, newCertId, date);
+  });
+
+  downloadBtn.addEventListener('click', () => {
+    html2canvas(document.getElementById('certificate-container'), {scale:2}).then(canvas => {
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = `Nater-Certificate-${certID.innerText}.png`;
+      link.click();
+    });
+  });
+});
+</script>
+</body>
+</html>
