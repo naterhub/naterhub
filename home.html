@@ -217,6 +217,19 @@ footer{padding:20px;text-align:center;background:var(--card-bg);border-top:2px s
 Backendless.initApp("EC3F680C-888B-4849-A309-C6BBA192EF6E","F2685256-D127-4363-B348-94D386889B02");
 Backendless.serverURL = "https://api.backendless.com";
 
+/* Load Profile Picture on page load */
+async function loadProfilePic() {
+  try {
+    const user = await Backendless.UserService.getCurrentUser();
+    if (user && user.profilePicUrl) {
+      document.getElementById('profilePic').src = user.profilePicUrl;
+    }
+  } catch(err) {
+    console.error("Failed to load profile picture:", err);
+  }
+}
+loadProfilePic();
+
 /* Sidebar Toggle */
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('sidebarOverlay');
@@ -270,10 +283,20 @@ document.getElementById('uploadProfile').addEventListener('click', ()=>{
     const file = e.target.files[0];
     if(!file) return;
     try{
-      const saved=await Backendless.Files.upload(file,'profile-pics',true);
-      document.getElementById('profilePic').src = saved.fileURL;
-      alert("Profile picture updated!");
-    }catch(err){console.error(err); alert("Upload failed.");}
+      const saved = await Backendless.Files.upload(file,'profile-pics',true);
+      // ✅ NEW: Update the user's profile with the new image URL
+      const user = await Backendless.UserService.getCurrentUser();
+      if (user) {
+        await Backendless.UserService.update({ objectId: user.objectId, profilePicUrl: saved.fileURL });
+        document.getElementById('profilePic').src = saved.fileURL;
+        alert("Profile picture updated and saved!");
+      } else {
+        alert("User not logged in. Profile picture not saved.");
+      }
+    }catch(err){
+      console.error(err); 
+      alert("Upload failed.");
+    }
   };
   input.click();
 });
@@ -312,6 +335,3 @@ document.getElementById('subscribeBtn').addEventListener('click', async ()=>{
 
 </body>
 </html>
-    
-    
-    
