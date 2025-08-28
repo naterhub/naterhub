@@ -8,27 +8,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/backendless@6.6.3/dist/backendless.min.js"></script>
 <style>
-    
-    #certificate-logo {
-  position: absolute;
-  top: 120px;
-  right: 20px;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;        /* ✅ perfect circle */
-  overflow: hidden;          /* ✅ crop image within circle */
-  border: 4px solid #DAA520; /* optional golden border */
-}
-
-#certificate-logo img {
-  width: 100%;               /* ✅ fit container */
-  height: 100%;
-  object-fit: cover;         /* ✅ no stretch, fills circle */
-  border-radius: 50%;        /* ✅ image itself circular */
-}
-    
-    
-:root{
+    :root{
   --primary-color:#ff6b6b;
   --secondary-color:#48e5c2;
   --dark-bg:#1e1e2d;
@@ -65,22 +45,45 @@ header.navbar .profile-pic{
 .sidebar a i{margin-right:10px;color:var(--secondary-color);}
 .sidebar a:hover{background:linear-gradient(90deg,var(--primary-color),var(--secondary-color));color:#fff;box-shadow:0 0 15px var(--primary-color),0 0 20px var(--secondary-color);}
 #sidebarOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1999;display:none;}
-.main-container{max-width:1000px;margin:80px auto 40px;padding:30px 20px;display:flex;flex-direction:column;gap:30px;
 
 
+.main-container {
+  max-width: 8000000000000000px;        /* keeps it centered, not too wide */
+  margin: 100px auto 50px;
+  
+
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;  /* always vertical */
+  gap: 30px;
 }
-.card{background:var(--card-bg);border-radius:20px;padding:30px;box-shadow:0 10px 25px rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.1);backdrop-filter:blur(5px);
-top:50px;
-position: relative;
+
+.card {
+  background: var(--card-bg);
+  border-radius: 20px;
+ padding:50px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  border: 2px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(5px);
+  width:100%; 
+  
+           /* always full width of container */
+  position: relative;
+  
 }
-.card h1,.card h2{color:var(--primary-color);margin-bottom:15px;text-shadow:0 0 10px var(--primary-color);}
+
+.card h1,.card h2{color:var(--primary-color);margin-bottom:15px;text-shadow:0 0 10px var(--primary-color);
+text-transform: uppercase;
+text-align:center
+font-weight: thicker;
+}
 .card p{line-height:1.6;color:var(--text-color);}
 #slideshow{
-  width:100%;height:250px;border-radius:15px;background:#222;display:flex;align-items:center;
+  width:100%;height:600px;border-radius:15px;background:#222;display:flex;align-items:center;
   justify-content:center;overflow:hidden;position:relative;
 }
 #slideshow img,#slideshow video{
-  width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;
+  width:103%;height:100%;object-fit:cover;position:absolute;top:0;left:0; right:0; bottom:0;
   opacity:0;transition:opacity 1s ease-in-out;
 }
 #slideshow img.active,#slideshow video.active{opacity:1;z-index:1;}
@@ -162,13 +165,6 @@ footer{padding:20px;text-align:center;background:var(--card-bg);border-top:2px s
     <button id="changePasswordBtn">Update Password</button>
   </div>
 </div>
-
-<div id="generator-section">
-  <div id="certificate-container">
-    <div id="certificate-logo"><img src="logo.png" alt="Logo"></div>
-
-
-
 <div class="main-container">
   <div class="card welcome-card">
     <h1>Welcome to Nater’s Learning Hub</h1>
